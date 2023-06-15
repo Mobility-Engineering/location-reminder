@@ -8,18 +8,18 @@
     <fragment
         android:id="@+id/FirstFragment"
         android:name="com.dexcom.sdk.locationreminders.FirstFragment"
-        android:label="@string/first_fragment_label"
+        android:label="@string/location_reminders"
         tools:layout="@layout/fragment_first">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            android:id="@+id/action_FirstFragment_to_MapsFragment"
+            app:destination="@id/MapsFragment" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
-        android:name="com.dexcom.sdk.locationreminders.SecondFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        android:id="@+id/MapsFragment"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:label="@string/location_reminders"
+        tools:layout="@layout/fragment_maps">
 
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
