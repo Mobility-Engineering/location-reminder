@@ -1,11 +1,11 @@
-package com.dexcom.sdk.locationreminders
+package com.dexcom.sdk.locationreminders.maps
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.fragment.findNavController
+import com.dexcom.sdk.locationreminders.R
 import com.dexcom.sdk.locationreminders.databinding.FragmentMapsBinding
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
@@ -17,10 +17,12 @@ import com.google.android.gms.maps.model.MarkerOptions
 /**
  * A simple [Fragment] subclass as the second destination in the navigation.
  */
-class MapsFragment : SupportMapFragment(), OnMapReadyCallback {
-
+class MapsFragment : Fragment(), OnMapReadyCallback {
+    //Estoy diciendo que sera un fragmento normal pero que implementa un SupportMapFragment por lo que sin problema debera de poderse
+    //hacer la conversion una vez que
     private var _binding: FragmentMapsBinding? = null
     private lateinit var map: GoogleMap
+
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
@@ -37,6 +39,8 @@ class MapsFragment : SupportMapFragment(), OnMapReadyCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val mapsFragment = childFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapsFragment.getMapAsync(this)
     }
 
     override fun onMapReady(googleMap: GoogleMap) {
@@ -51,6 +55,7 @@ class MapsFragment : SupportMapFragment(), OnMapReadyCallback {
         map.moveCamera(CameraUpdateFactory.newLatLngZoom(homeLatLng, zoomLevel))
         map.addMarker(MarkerOptions().position(homeLatLng))
     }
+
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
