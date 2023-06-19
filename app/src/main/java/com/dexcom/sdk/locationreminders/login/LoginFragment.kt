@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.fragment.findNavController
 import com.dexcom.sdk.locationreminders.R
 import com.dexcom.sdk.locationreminders.databinding.FragmentLoginBinding
 import com.firebase.ui.auth.AuthUI
@@ -79,7 +80,7 @@ class LoginFragment : Fragment() {
                 TAG,
                 "Succesfully signed in user ${FirebaseAuth.getInstance().currentUser?.displayName}!"
             )
-            // ...
+            findNavController().navigate(R.id.action_LoginFragment_to_MapsFragment)
         } else {
             // Sign in failed. If response is null the user canceled the
             // sign-in flow using the back button. Otherwise check
