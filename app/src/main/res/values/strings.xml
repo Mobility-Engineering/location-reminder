@@ -5,8 +5,15 @@
     <string name ="location_reminders">Location Reminders</string>
     <string name="next">Next</string>
     <string name="previous">Previous</string>
-
+    <string name="welcome">Welcome to the Location reminder app</string>
+    <string name="login">Login</string>
+    <string name="logout">Logout</string>
     <string name="hello_first_fragment">Hello first fragment</string>
     <string name="hello_second_fragment">Hello second fragment. Arg: %1$s</string>
     <string name="google_maps_key">AIzaSyChVoMq2H9ZnOshHc0fWn-BXxYopLb_tg4</string>
+    <string name="settings">Settings</string>
+    <string name="next_steps">Next steps</string>
+    <string name="permission_denied_explanation">You need to grant location permission for application to work</string>
+    <string name="next_step_instructions">Please select a Point of Interest in the Map for Reminder</string>
+    <string name="poi_selection">Please select a Point of Interest</string>
 </resources>
