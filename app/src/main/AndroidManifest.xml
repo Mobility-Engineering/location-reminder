@@ -3,6 +3,16 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.dexcom.sdk.locationreminders">
 
+    <!--
+        The FINE_LOCATION permission is required for geofencing functionality to work.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
+    <!--
+        The BACKGROUND_LOCATION permission is required for geofencing functionality to work on Q+
+    -->
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
