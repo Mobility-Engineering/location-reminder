@@ -13,17 +13,37 @@
 
         <action
             android:id="@+id/action_LoginFragment_to_MapsFragment"
-            app:destination="@id/MapsFragment" />
+            app:destination="@id/MapsFragment"
+            app:enterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_in_right"/>
     </fragment>
 
     <fragment
         android:id="@+id/MapsFragment"
-        android:name="com.dexcom.sdk.locationreminders.maps.MapsFragment"
+        android:name="com.dexcom.sdk.locationreminders.map.MapsFragment"
         android:label="@string/location_reminders"
         tools:layout="@layout/fragment_maps">
 
         <action
             android:id="@+id/action_MapsFragment_to_LoginFragment"
-            app:destination="@id/LoginFragment" />
+            app:destination="@id/LoginFragment"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/fade_out"/>
+        <action
+            android:id="@+id/action_MapsFragment_to_ReminderFragment"
+            app:destination="@id/ReminderFragment"
+            app:enterAnim="@anim/fade_in"
+            app:exitAnim="@anim/fade_out"/>/>
+
+
+    </fragment>
+    <fragment
+        android:id="@+id/ReminderFragment"
+        android:name="com.dexcom.sdk.locationreminders.reminder.ReminderFragment"
+        android:label="fragment_reminder"
+        tools:layout="@layout/fragment_reminder" >
+        <argument
+            android:name="reminder"
+            app:argType="com.dexcom.sdk.locationreminders.reminder.Reminder"/>
     </fragment>
 </navigation>
