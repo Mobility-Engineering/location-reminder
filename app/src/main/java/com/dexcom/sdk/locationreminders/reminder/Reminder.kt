@@ -8,6 +8,7 @@ import kotlinx.android.parcel.Parcelize
 @Parcelize
 data class Reminder constructor(
     val id: Long,
+    val name:String,
     val title: String,
     val description: String,
     val latitude: Double,
