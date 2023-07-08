@@ -23,22 +23,22 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.navigation.fragment.findNavController
 import com.dexcom.sdk.locationreminders.BuildConfig
 import com.dexcom.sdk.locationreminders.R
 import com.dexcom.sdk.locationreminders.databinding.FragmentMapsBinding
+import com.dexcom.sdk.locationreminders.reminder.ReminderViewModel
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.OnMapReadyCallback
 import com.google.android.gms.maps.SupportMapFragment
-import com.google.android.gms.maps.model.BitmapDescriptorFactory
-import com.google.android.gms.maps.model.LatLng
-import com.google.android.gms.maps.model.MapStyleOptions
-import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.*
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.android.synthetic.main.fragment_maps.*
 import java.util.*
 
 
@@ -48,6 +48,7 @@ import java.util.*
 class MapsFragment : Fragment(), OnMapReadyCallback {
 
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
+    private val viewModel by activityViewModels<ReminderViewModel>()
     private var checkForPermission = false
     private var lastPermissionRequest = PERMISSION_HOLDER
     private val runningROrLater =
@@ -55,10 +56,9 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     private val runningQOrLater =
         android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q
 
-
     private var _binding: FragmentMapsBinding? = null
     private val binding get() = _binding!!
-
+    private var lastMarker: Marker? = null
     private lateinit var mapsFragment: SupportMapFragment
     private lateinit var map: GoogleMap
 
@@ -154,7 +154,7 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
             -binding.saveButton.width.toFloat(),
             0f
         )
-        animator.duration = 2500
+        animator.duration = 1000
         animator.disableViewDuringAnimation(binding.saveButton)
 
         animator.start()
@@ -228,8 +228,11 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireActivity())
         _binding = FragmentMapsBinding.inflate(inflater, container, false)
-        binding.saveButton.setOnClickListener{
-            //this.findNavController().navigate(MapsFragmentDirections.actionMapsFragmentToReminderFragment())
+        binding.saveButton.setOnClickListener {
+
+
+            this.findNavController()
+                .navigate(MapsFragmentDirections.actionMapsFragmentToReminderFragment())
         }
         return binding.root
     }
@@ -304,133 +307,146 @@ class MapsFragment : Fragment(), OnMapReadyCallback {
     }
 
     // Places a marker on the map and displays an info window that contains POI name.
-    private fun setLocationClick(map:GoogleMap){
+    private fun setLocationClick(map: GoogleMap) {
         map.setOnMapClickListener { loc ->
-            val poiMarker = map.addMarker(
+            lastMarker?.let {
+                it.remove()
+            }
+            lastMarker = map.addMarker(
                 MarkerOptions()
                     .position(loc)
             )
-        }
-    }
-    private fun setPoiClick(map: GoogleMap) {
-        map.setOnPoiClickListener { poi ->
-            val poiMarker = map.addMarker(
-                MarkerOptions()
-                    .position(poi.latLng)
-                    .title(poi.name)
-            )
-            poiMarker.showInfoWindow()
-        }
-    }
-    private fun setMapStyle(map: GoogleMap) {
-        try {
-            val success =
-                map.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style))
-            if (!success)
-                Log.e(TAG, "Style parsing failed")
-        } catch (e: Resources.NotFoundException) {
-            e.message?.let {
-                Log.e(TAG, "{Style error: $it) }")
-            }
+            viewModel.updateLastLocation(loc)
         }
     }
 
-        override fun onMapReady(googleMap: GoogleMap) {
-            map = googleMap
-            setMapStyle(map)
-            setPoiClick(map)
-            setLocationClick(map)
-            updateMap()
+
+private fun setPoiClick(map: GoogleMap) {
+    map.setOnPoiClickListener { poi ->
+        binding.saveButton.isEnabled = true
+        lastMarker?.let {
+            it.remove()
         }
+        lastMarker = map.addMarker(
+            MarkerOptions()
+                .position(poi.latLng)
+                .title(poi.name)
+        )
+        lastMarker?.showInfoWindow()
+        viewModel.updateLastLocation(poi.latLng)
+        viewModel.updateLastPoi(poi)
+    }
+}
 
-        private fun updateMap() {
-
-            if (ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-                return
-            }
-            map.isMyLocationEnabled = true
-
-            fusedLocationProviderClient.lastLocation.addOnCompleteListener { task ->
-                val location: Location? = task.result
-                location?.let {
-                    val latitude = it.latitude
-                    val longitude = it.longitude
-                    val zoomLevel = 15f
-                    val overlaySize = 100f
-
-                    val homeLatLng = LatLng(latitude, longitude)
-                    map.moveCamera(CameraUpdateFactory.newLatLngZoom(homeLatLng, zoomLevel))
-                    map.addMarker(MarkerOptions().position(homeLatLng))
-                }
-            }
-
-        }
-
-        override fun onStart() {
-            super.onStart()
-            requestForegroundAndBackgroundPermissionApproved()
-            if (foregroundAndBackgroundPermissionApproved())
-                showNextStepIndications()
-            //checkPermissionsAndStartGeofencing()
-        }
-
-
-        private fun foregroundAndBackgroundPermissionApproved(): Boolean {
-            val foregroundLocationApproved =
-                PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                )
-            val backgroundPermissionApproved = if (runningQOrLater) {
-                PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
-                    requireContext(),
-                    Manifest.permission.ACCESS_BACKGROUND_LOCATION
-                )
-            } else {
-                true
-            }
-            return foregroundLocationApproved && backgroundPermissionApproved
-        }
-
-
-        override fun onDestroyView() {
-            super.onDestroyView()
-            _binding = null
-        }
-
-        private fun ObjectAnimator.disableViewDuringAnimation(view: View) {
-
-            // This extension method listens for start/end events on an animation and disables
-            // the given view for the entirety of that animation.
-
-            addListener(object : AnimatorListenerAdapter() {
-
-
-                override fun onAnimationStart(animation: Animator) {
-                    binding.saveButton.visibility = View.VISIBLE
-                    //view.isEnabled = false
-                }
-
-                override fun onAnimationEnd(animation: Animator) {
-                    view.isEnabled = true
-                }
-            })
-
-
-        }
-
-        companion object {
-            const val TAG = "MAPS_FRAGMENT"
-            const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 1
-            const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 2
-            const val PERMISSION_HOLDER = "PERMISSION_HOLDER"
-
+private fun setMapStyle(map: GoogleMap) {
+    try {
+        val success =
+            map.setMapStyle(MapStyleOptions.loadRawResourceStyle(context, R.raw.map_style))
+        if (!success)
+            Log.e(TAG, "Style parsing failed")
+    } catch (e: Resources.NotFoundException) {
+        e.message?.let {
+            Log.e(TAG, "{Style error: $it) }")
         }
     }
+}
+
+override fun onMapReady(googleMap: GoogleMap) {
+    map = googleMap
+    setMapStyle(map)
+    setPoiClick(map)
+    setLocationClick(map)
+    updateMap()
+}
+
+private fun updateMap() {
+
+    if (ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_COARSE_LOCATION
+        ) != PackageManager.PERMISSION_GRANTED
+    ) {
+        return
+    }
+    map.isMyLocationEnabled = true
+
+    fusedLocationProviderClient.lastLocation.addOnCompleteListener { task ->
+        val location: Location? = task.result
+        location?.let {
+            val latitude = it.latitude
+            val longitude = it.longitude
+            val zoomLevel = 15f
+            val overlaySize = 100f
+
+            val homeLatLng = LatLng(latitude, longitude)
+            viewModel.updateLastLocation(homeLatLng)
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(homeLatLng, zoomLevel))
+            map.addMarker(MarkerOptions().position(homeLatLng))
+        }
+    }
+
+}
+
+override fun onStart() {
+    super.onStart()
+    requestForegroundAndBackgroundPermissionApproved()
+    if (foregroundAndBackgroundPermissionApproved())
+        showNextStepIndications()
+    //checkPermissionsAndStartGeofencing()
+}
+
+
+private fun foregroundAndBackgroundPermissionApproved(): Boolean {
+    val foregroundLocationApproved =
+        PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_FINE_LOCATION
+        )
+    val backgroundPermissionApproved = if (runningQOrLater) {
+        PackageManager.PERMISSION_GRANTED == ActivityCompat.checkSelfPermission(
+            requireContext(),
+            Manifest.permission.ACCESS_BACKGROUND_LOCATION
+        )
+    } else {
+        true
+    }
+    return foregroundLocationApproved && backgroundPermissionApproved
+}
+
+
+override fun onDestroyView() {
+    super.onDestroyView()
+    _binding = null
+}
+
+private fun ObjectAnimator.disableViewDuringAnimation(view: View) {
+
+    // This extension method listens for start/end events on an animation and disables
+    // the given view for the entirety of that animation.
+
+    addListener(object : AnimatorListenerAdapter() {
+
+
+        override fun onAnimationStart(animation: Animator) {
+            binding.saveButton.visibility = View.VISIBLE
+            //view.isEnabled = false
+        }
+
+        override fun onAnimationEnd(animation: Animator) {
+        }
+    })
+
+
+}
+
+companion object {
+    const val TAG = "MAPS_FRAGMENT"
+    const val REQUEST_FOREGROUND_ONLY_PERMISSIONS_REQUEST_CODE = 1
+    const val REQUEST_FOREGROUND_AND_BACKGROUND_PERMISSION_RESULT_CODE = 2
+    const val PERMISSION_HOLDER = "PERMISSION_HOLDER"
+
+}
+}
