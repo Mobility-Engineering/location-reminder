@@ -1,24 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout>
+<layout xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
     <data>
         <variable
             name="viewModel"
             type = "com.dexcom.sdk.locationreminders.reminder.ReminderViewModel"/>
     </data>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+<FrameLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".reminderslist.RemindersFragment">
+    tools:context=".reminders.RemindersFragment">
 
-    <!-- TODO: Update blank fragment layout -->
     <androidx.recyclerview.widget.RecyclerView
-        android:id = "@+id/recycler"
-        android:layout_width = "match_parent"
-        android:layout_height = "match_parent"
-        app:listData="@{viewModel.reminders}"
-        />
+        android:id="@+id/recycler"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        tools:listitem="@layout/item_view_reminder" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="127dp"
+        android:layout_height="190dp"
+        android:layout_gravity="center"
+        android:visibility="@{viewModel.noDataVisibility}"
+        app:srcCompat="@drawable/ic_baseline_file_copy_24" />
+    !--app:listData="@{viewModel.reminders.value}"-->
 
 </FrameLayout>
 </layout>

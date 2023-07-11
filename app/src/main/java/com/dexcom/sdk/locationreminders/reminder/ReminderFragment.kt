@@ -6,11 +6,13 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.dexcom.sdk.locationreminders.MainActivity
 import com.dexcom.sdk.locationreminders.R
 import com.dexcom.sdk.locationreminders.database.DatabaseReminder
 import com.dexcom.sdk.locationreminders.databinding.FragmentMapsBinding
 import com.dexcom.sdk.locationreminders.databinding.FragmentReminderBinding
+import com.dexcom.sdk.locationreminders.map.MapsFragmentDirections
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 // TODO: Rename parameter arguments, choose names that match
@@ -54,6 +56,7 @@ class ReminderFragment : Fragment() {
                     binding.editTextTextTitle.text.toString(),
                     binding.editTextTextDescription.text.toString())
                 )
+            findNavController().navigate(ReminderFragmentDirections.actionReminderFragmentToRemindersFragment())
         }
         // Inflate the layout for this fragment
         _binding = FragmentReminderBinding.inflate(inflater, container, false)

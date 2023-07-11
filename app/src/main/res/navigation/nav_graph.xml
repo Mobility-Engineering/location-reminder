@@ -42,8 +42,13 @@
         android:name="com.dexcom.sdk.locationreminders.reminder.ReminderFragment"
         android:label="fragment_reminder"
         tools:layout="@layout/fragment_reminder" >
-        <argument
-            android:name="reminder"
-            app:argType="com.dexcom.sdk.locationreminders.reminder.Reminder"/>
+
+        <action
+            android:id="@+id/action_ReminderFragment_to_remindersFragment"
+            app:destination="@id/remindersFragment" />
     </fragment>
+    <fragment
+        android:id="@+id/remindersFragment"
+        android:name="com.dexcom.sdk.locationreminders.reminders.RemindersFragment"
+        android:label="RemindersFragment" />
 </navigation>
