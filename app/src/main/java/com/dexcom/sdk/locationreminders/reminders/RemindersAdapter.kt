@@ -16,8 +16,8 @@ class RemindersAdapter(val onClickListener: OnClickListener) :
      */
     class ReminderViewHolder(private var binding: ItemViewReminderBinding) :
         RecyclerView.ViewHolder(binding.root) {
-        fun bind(reminder: Reminder) {
-
+        fun bind(onClickListener:OnClickListener, reminder: Reminder) {
+            binding.clickListener =  onClickListener
             binding.reminder = reminder
             // This is important, because it forces the data binding to execute immediately,
             // which allows the RecyclerView to make the correct view size measurements
@@ -65,10 +65,12 @@ class RemindersAdapter(val onClickListener: OnClickListener) :
      */
     override fun onBindViewHolder(holder: ReminderViewHolder, position: Int) {
         val reminder = getItem(position)
-        holder.itemView.setOnClickListener {
+        /*holder.itemView.setOnClickListener {
             onClickListener.onClick(reminder)
         }
-        holder.bind(reminder)
+
+         */
+        holder.bind(onClickListener,reminder)
     }
 
     /**
