@@ -9,6 +9,8 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import android.view.Menu
 import android.view.MenuItem
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ViewModelProvider
 import com.dexcom.sdk.locationreminders.databinding.ActivityMainBinding
 import com.dexcom.sdk.locationreminders.reminder.ReminderViewModel
@@ -38,9 +40,19 @@ class MainActivity : AppCompatActivity(){
         }
     }
 
+
+
     override fun onSupportNavigateUp(): Boolean {
         val navController = findNavController(R.id.nav_host_fragment_content_main)
         return navController.navigateUp(appBarConfiguration)
                 || super.onSupportNavigateUp()
+    }
+}
+class ActivityLifeCycleObserver(private val update:()->Unit):
+    DefaultLifecycleObserver {
+    override fun onCreate(owner: LifecycleOwner) {
+        super.onCreate(owner)
+        owner.lifecycle.removeObserver(this)
+        update()
     }
 }

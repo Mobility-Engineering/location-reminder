@@ -1,18 +1,23 @@
 package com.dexcom.sdk.locationreminders.reminder
 
+import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Observer
 import androidx.navigation.fragment.findNavController
+import com.dexcom.sdk.locationreminders.ActivityLifeCycleObserver
 import com.dexcom.sdk.locationreminders.MainActivity
 import com.dexcom.sdk.locationreminders.R
-import com.dexcom.sdk.locationreminders.database.DatabaseReminder
+//import com.dexcom.sdk.locationreminders.database.DatabaseReminder
 import com.dexcom.sdk.locationreminders.databinding.FragmentMapsBinding
 import com.dexcom.sdk.locationreminders.databinding.FragmentReminderBinding
 import com.dexcom.sdk.locationreminders.map.MapsFragmentDirections
+import com.dexcom.sdk.locationreminders.util.EventObserver
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
 // TODO: Rename parameter arguments, choose names that match
@@ -41,14 +46,17 @@ class ReminderFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        /*
         fab =
             (requireActivity() as MainActivity).findViewById(R.id.fab) as FloatingActionButton
         fab.visibility = View.VISIBLE
+
+         */
+        /*
         fab.setOnClickListener {
-            val latLng = viewModel.lastLatLng
+            val latLng = viewModel.lastLa   tLng
             val poi = viewModel.lastPoi
-            viewModel.insertReminderToDatabase(
-                DatabaseReminder(
+            /*viewModel.saveReminder(Reminder(
                     0,
                     poi.name,
                     poi.latLng.latitude,//latLng.latitude,
@@ -56,15 +64,36 @@ class ReminderFragment : Fragment() {
                     binding.editTextTextTitle.text.toString(),
                     binding.editTextTextDescription.text.toString())
                 )
+
+             */
             findNavController().navigate(ReminderFragmentDirections.actionReminderFragmentToRemindersFragment())
         }
+
+         */
         // Inflate the layout for this fragment
         _binding = FragmentReminderBinding.inflate(inflater, container, false)
         _binding.viewModel = viewModel
         return binding.root
-
-
     }
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        /*activity?.lifecycle?.addObserver(ActivityLifeCycleObserver {
+            Log.i("REMINDERS_FRAGMENT", "ActivityLifeCycleObserver works!")
+        })
+
+         */
+        setupNavigation()
+    }
+    private fun setupNavigation() {
+        viewModel.reminderUpdatedEvent.observe(this, EventObserver {
+            val action = ReminderFragmentDirections
+                .actionReminderFragmentToRemindersFragment()
+            findNavController().navigate(action)
+
+        })
+    }
+
 
     companion object {
         /**
