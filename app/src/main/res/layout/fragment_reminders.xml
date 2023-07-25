@@ -17,16 +17,30 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        tools:listitem="@layout/item_view_reminder" />
+        tools:listitem="@layout/item_view_reminder"
+        app:items="@{viewModel.items}"/>
+        <!--app:items="@{viewmodel.items}"/-->
+
 
     <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="127dp"
-        android:layout_height="190dp"
+        android:id="@+id/emptyRemindersImageView"
+        android:layout_width="71dp"
+        android:layout_height="154dp"
         android:layout_gravity="center"
-        android:visibility="@{viewModel.noDataVisibility}"
+    android:visibility="invisible"
         app:srcCompat="@drawable/ic_baseline_file_copy_24" />
+    <!--@{viewmodel.noDataVisibility}-->
+    <!--android:visibility="@{viewModel.noDataVisibility}-->"
     !--app:listData="@{viewModel.reminders.value}"-->
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center|bottom|end"
+        android:backgroundTint = "@color/google_map_red"
+        app:tint = "@color/white"
+        android:layout_margin="16dp"
+        app:srcCompat="@drawable/ic_baseline_add_24"/>
 
 </FrameLayout>
 </layout>
