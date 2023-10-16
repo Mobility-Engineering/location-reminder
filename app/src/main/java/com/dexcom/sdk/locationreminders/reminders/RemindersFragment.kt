@@ -12,24 +12,29 @@ import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.databinding.BindingAdapter
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.RecyclerView
 import com.dexcom.sdk.locationreminders.ActivityLifeCycleObserver
-import com.dexcom.sdk.locationreminders.MainActivity
+import com.dexcom.sdk.locationreminders.RemindersActivity
 import com.dexcom.sdk.locationreminders.R
+import com.dexcom.sdk.locationreminders.ReminderApplication
 import com.dexcom.sdk.locationreminders.database.asDomainModel
 import com.dexcom.sdk.locationreminders.databinding.FragmentRemindersBinding
 import com.dexcom.sdk.locationreminders.reminder.Reminder
 import com.dexcom.sdk.locationreminders.reminder.ReminderViewModel
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 
-class RemindersFragment : Fragment() {
+class   RemindersFragment : Fragment() {
     private lateinit var _binding: FragmentRemindersBinding
     private val binding get() = _binding!!
     private lateinit var adapter: RemindersAdapter
     private lateinit var fab: FloatingActionButton
 
-    val viewModel by activityViewModels<ReminderViewModel>() //by vieModels
+    //val viewModel by activityViewModels<ReminderViewModel>() //by vieModels
+    val viewModel:ReminderViewModel by viewModels<ReminderViewModel> {
+        ReminderViewModel.RemindersViewModelFactory((requireContext().applicationContext as ReminderApplication).remindersRepository)
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
     }
@@ -40,8 +45,11 @@ class RemindersFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
 
+        /*
         fab = (requireActivity() as MainActivity).findViewById(R.id.fab) as FloatingActionButton
         fab.visibility = View.INVISIBLE
+
+         */
         // Inflate the layout for this fragment
 
         _binding = FragmentRemindersBinding.inflate(inflater, container, false)
