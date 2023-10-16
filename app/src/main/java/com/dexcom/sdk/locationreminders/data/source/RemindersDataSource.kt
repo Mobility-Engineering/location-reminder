@@ -15,12 +15,13 @@ interface RemindersDataSource {
 
     fun observeReminder(reminderId: String): LiveData<Result<Reminder>>
 
-    suspend fun getReminder(reminderId: String): Result<Reminder>
+    suspend fun getReminder(reminderId: Long): Result<Reminder>
 
     suspend fun refreshReminder(reminderId: String)
 
-    suspend fun saveReminder(reminder: Reminder)
+    suspend fun saveReminder(reminder: Reminder):Long
 
+    suspend fun remoteSaveReminder(reminder:Reminder):Long
     suspend fun completeReminder(reminder: Reminder)
 
     suspend fun completeReminder(reminderId: String)
@@ -33,5 +34,8 @@ interface RemindersDataSource {
 
     suspend fun deleteAllReminders()
 
-    suspend fun deleteReminder(reminderId: String)
+    suspend fun deleteReminder(reminderId: Long)
+
+
+    suspend fun updateReminder(reminder:Reminder)
 }

@@ -15,12 +15,14 @@ import kotlinx.coroutines.launch
 
 class DefaultRemindersRepository(
     private val remindersLocalDataSource: RemindersDataSource,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO){
+    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO) : RemindersRepository {
 
 
-    companion object {
+
+    /*companion object {
         @Volatile
         private var INSTANCE: DefaultRemindersRepository? = null
+
 
         fun getRepository(app: Application): DefaultRemindersRepository {
             return INSTANCE ?: synchronized(this) {
@@ -31,27 +33,50 @@ class DefaultRemindersRepository(
                 }
             }
         }
-    }
+
+         */
 
 
-    suspend fun getReminders(forceUpdate: Boolean = false): Result<List<Reminder>> {
+
+
+    override suspend fun getReminders(forceUpdate: Boolean): Result<List<Reminder>> {
 
             return remindersLocalDataSource.getReminders()
     }
 
-    fun observeReminders(): LiveData<Result<List<Reminder>>> {
+    override suspend fun getReminder(reminderId: Long): Result<Reminder> {
+        return remindersLocalDataSource.getReminder(reminderId)
+    }
+
+    override fun observeReminders(): LiveData<Result<List<Reminder>>> {
         return remindersLocalDataSource.observeReminders()
     }
-    suspend fun refreshReminders(){
+    override suspend fun refreshReminders(){
         updateReminders()
     }
 
-    suspend fun saveReminder(reminder: Reminder) {
+    override suspend fun saveReminder(reminder: Reminder):Long {
+        var id = 0L
         coroutineScope {
-            //launch { tasksRemoteDataSource.saveTask(task) }
-            launch { remindersLocalDataSource.saveReminder(reminder) }
+            launch { remindersLocalDataSource.remoteSaveReminder(reminder)} //for EspressoIdlingResource testing
+            launch { id = remindersLocalDataSource.saveReminder(reminder) }
         }
+        return id
     }
+
+    override suspend fun deleteAllReminders() {
+
+        remindersLocalDataSource.deleteAllReminders()
+    }
+
+    override suspend fun updateReminder(reminder: Reminder) {
+        remindersLocalDataSource.updateReminder(reminder)
+    }
+
+    override suspend fun deleteReminder(reminderId: Long) {
+        remindersLocalDataSource.deleteReminder(reminderId)
+    }
+
     private suspend fun updateReminders(){
         //Not such TasksRemoteDataSource
 

@@ -32,9 +32,9 @@ fun List<Reminder>.asDomainModel(): List<Reminder> {
 interface RemindersDao {
 
     /**
-     * Observes list of tasks.
+     * Observes list of reminders.
      *
-     * @return all tasks.
+     * @return all reminders.
      */
     @Query("SELECT * from reminder_table")
     fun observeReminders(): LiveData<List<Reminder>>
@@ -48,18 +48,27 @@ interface RemindersDao {
     //As mentioned in the comments, remove suspend. When a method returns an observable, there is no reason to make it suspend
     // since it just returns and object, does not run any query until it is observed.
 
+
+    @Update
+     fun updateReminder(reminder: Reminder): Int
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(vararg reminder: Reminder)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertReminder(reminder: Reminder)
+    fun insertReminder(reminder: Reminder): Long
+
+    @Query("SELECT * FROM reminder_table WHERE id = :remId")
+    fun getReminderById(remId: Long): Reminder?
 
     @Query("DELETE FROM reminder_table")
     fun clear()
+
+    @Query("DELETE FROM reminder_table WHERE id = :remId")
+    fun deleteReminder(remId:Long)
 }
 
-@Database(entities = [Reminder::class], version = 2)
-abstract class ReminderDatabase : RoomDatabase() {
+    @Database(entities = [Reminder::class], version = 2)
+    abstract class ReminderDatabase : RoomDatabase() {
     abstract fun remindersDao(): RemindersDao
 
     companion object {
