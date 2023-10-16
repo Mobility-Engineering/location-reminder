@@ -31,7 +31,7 @@
         app:srcCompat="@drawable/ic_baseline_file_copy_24" />
     <!--@{viewmodel.noDataVisibility}-->
     <!--android:visibility="@{viewModel.noDataVisibility}-->"
-    !--app:listData="@{viewModel.reminders.value}"-->
+    <!--app:listData="@{viewModel.reminders.value}"-->
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:layout_width="wrap_content"
