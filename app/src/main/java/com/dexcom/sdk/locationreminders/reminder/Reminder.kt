@@ -11,15 +11,15 @@ data class Reminder constructor(
     @PrimaryKey(autoGenerate = true)
     val id: Long,
     @ColumnInfo(name = "name")
-    val name: String,
+    var name: String,
     @ColumnInfo(name = "latitude")
-    val latitude: Double,
+    var latitude: Double,
     @ColumnInfo(name = "longitude")
-    val longitude: Double,
+    var longitude: Double,
     @ColumnInfo(name = "title")
-    val title: String,
+    var title: String,
     @ColumnInfo(name = "description")
-    val description: String,
+    var description: String,
     @ColumnInfo(name = "completed")
     var isCompleted: Boolean = false,
 ) {
